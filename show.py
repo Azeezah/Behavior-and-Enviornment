@@ -11,9 +11,9 @@ def show(data, col_num=0, filename="graph.png"):
   print('graphing col %d, %s'%(col_num, the_important_columns[col_num]))
   x = numeric(x)
   print(stats(x))
-  plt.hist(x, 50, density=1, facecolor='green')
+  plt.hist(x, bins=50)
   plt.xlabel(the_important_columns[col_num])
-  plt.ylabel('Probability %')
+  plt.ylabel('Frequency')
   #plt.axis([0, 60, 0, 1])
   plt.savefig(filename)
 
