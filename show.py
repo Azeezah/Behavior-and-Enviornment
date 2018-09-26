@@ -16,7 +16,7 @@ def show(data, col_num=0, filename="graph.png"):
   x = get_col(the_important_columns[col_num], data)
   print('graphing col %d, %s'%(col_num, the_important_columns[col_num]))
   x = numeric(x)
-  print(stats(x))
+  show_stats(x, the_important_columns[col_num])
   plt.hist(x, bins=50)
   plt.xlabel(the_important_columns[col_num])
   plt.ylabel('Frequency')
@@ -28,6 +28,10 @@ def show_correlations(data):
   for i, x in enumerate(the_important_columns):
     for j, y in enumerate(the_important_columns):
       print x, 'to', y, correlation(numeric(cols[i]), numeric(cols[j]))
+
+def show_stats(x, name):
+  print name, 'length %d, mean %.2f, stddev %.2f, range %d' \
+    % (len(x), mean(x), stddev(x), max(x)-min(x))
 
 def get_correlations(data):
   cols = [get_col(label, data) for label in the_important_columns]
@@ -50,8 +54,8 @@ def numeric(xs):
   '''takes a list and removes None values'''
   return [x for x in xs if x!=None]
 
-def stats(x):
-  return ('len', len(x), 'avg', sum(x)/len(x))
+def mean(x):
+  return sum(x)/len(x)
 
 def stddev(xs):
   mu = sum(xs)/len(xs)
