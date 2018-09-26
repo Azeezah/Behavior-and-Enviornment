@@ -27,13 +27,16 @@ indexed_cols = [
 print(indexed_cols)
 
 def maybeFloat(string):
-  '''Converts NaN values to none.  While NaN is a valid floating point value, it is truthy and cannot be tested for equality'''
+  '''Converts NaN values to None.
+  While NaN is a valid floating point value,
+  it is truthy and cannot be tested for equality'''
   return None if string == "NaN" else float(string)
 
 def readfile(office_env_data_file):
   with open(office_env_data_file, 'rb') as f:
     rows = [[maybeFloat(val) for val in row.split()] for row in f.readlines()]
-    labeled_rows = [{col_name : row[i] for i, col_name in indexed_cols} for row in rows]
+    labeled_rows = [{col_name : row[i] for i, col_name in indexed_cols}
+      for row in rows]
   return labeled_rows
 
 def writefile(labeled_rows, output_path='data.csv'):
