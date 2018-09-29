@@ -14,13 +14,11 @@ def show_all(data, cols=the_important_columns):
 def show(data, col_num=0, filename="graph.png"):
   '''takes a list of dictionaries'''
   x = get_col(the_important_columns[col_num], data)
-  print('graphing col %d, %s'%(col_num, the_important_columns[col_num]))
   x = numeric(x)
   show_stats(x, the_important_columns[col_num])
   plt.hist(x, bins=50)
   plt.xlabel(the_important_columns[col_num])
   plt.ylabel('Frequency')
-  #plt.axis([0, 60, 0, 1])
   plt.savefig(filename)
   plt.clf()
 
@@ -37,9 +35,10 @@ def show_important_correlations(data):
     print col_names[x], 'to', col_names[y], correlation
 
 def show_stats(x, name):
-  print name
+  print '\n'+name+':'
   print 'length %d, mean %.2f, stddev %.2f, range %d, median %.2f' \
     % (len(x), mean(x), stddev(x), max(x)-min(x), median(x))
+
   modes_x = modes(x)
   num_modes = len(modes_x)
   print 'modes: ', modes_x[:3], ('and %d more' % (num_modes-3) if num_modes > 3 else '')
@@ -95,29 +94,4 @@ def modes(xs):
 def median(xs):
   n = len(xs)
   return mean(sorted(xs)[n//2+n%2-1 : n//2+1])
-
-'''
-[1, 2, 3] 1:2
-[1, 2] 0:2
-[1, 2, 3, 4] 1:3
-
-n // 2 - (1-n%2)
-n // 2 - 1 + 1 + (1-n%2)
-
-n//2-1 : n//2+1 - n%2
-
-
-[0, 1, 2, 3, 4]
-   n//2   i, j   n%2
-5 -- 2 -- 2, 3 -- 1
-4 -- 2 -- 1, 3 -- 0
-3 -- 1 -- 1, 2 -- 1
-2 -- 1 -- 0, 2 -- 0
-1 -- 0 -- 0, 1 -- 1
-
-i = n//2 - (1-n%2)
-j = n//2 - (1-n%2) + 1 + (1-n%2)
-
-i, j = n//2+n%2-1 : n//2 + 1
-'''
 
