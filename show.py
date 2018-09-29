@@ -22,6 +22,7 @@ def show(data, col_num=0, filename="graph.png"):
   plt.ylabel('Frequency')
   #plt.axis([0, 60, 0, 1])
   plt.savefig(filename)
+  plt.clf()
 
 def show_correlations(data):
   cols = [get_col(label, data) for label in the_important_columns]
@@ -29,9 +30,19 @@ def show_correlations(data):
     for j, y in enumerate(the_important_columns):
       print x, 'to', y, correlation(numeric(cols[i]), numeric(cols[j]))
 
+def show_important_correlations(data):
+  col_names = the_important_columns
+  print "\nThe Larger Correlations:"
+  for x, y, correlation in get_important_correlations(data):
+    print col_names[x], 'to', col_names[y], correlation
+
 def show_stats(x, name):
-  print name, 'length %d, mean %.2f, stddev %.2f, range %d' \
-    % (len(x), mean(x), stddev(x), max(x)-min(x))
+  print name
+  print 'length %d, mean %.2f, stddev %.2f, range %d, median %.2f' \
+    % (len(x), mean(x), stddev(x), max(x)-min(x), median(x))
+  modes_x = modes(x)
+  num_modes = len(modes_x)
+  print 'modes: ', modes_x[:3], ('and %d more' % (num_modes-3) if num_modes > 3 else '')
 
 def get_correlations(data):
   cols = [get_col(label, data) for label in the_important_columns]
@@ -73,4 +84,40 @@ def correlation(xs, ys):
   except ZeroDivisionError:
     return 1
 
+def modes(xs):
+  counts = dict()
+  for x in xs:
+     if x in counts: counts[x]+=1
+     else: counts[x] = 1
+  max_count = max(counts.values())
+  return [x for x, count in counts.items() if count == max_count]
+
+def median(xs):
+  n = len(xs)
+  return mean(sorted(xs)[n//2+n%2-1 : n//2+1])
+
+'''
+[1, 2, 3] 1:2
+[1, 2] 0:2
+[1, 2, 3, 4] 1:3
+
+n // 2 - (1-n%2)
+n // 2 - 1 + 1 + (1-n%2)
+
+n//2-1 : n//2+1 - n%2
+
+
+[0, 1, 2, 3, 4]
+   n//2   i, j   n%2
+5 -- 2 -- 2, 3 -- 1
+4 -- 2 -- 1, 3 -- 0
+3 -- 1 -- 1, 2 -- 1
+2 -- 1 -- 0, 2 -- 0
+1 -- 0 -- 0, 1 -- 1
+
+i = n//2 - (1-n%2)
+j = n//2 - (1-n%2) + 1 + (1-n%2)
+
+i, j = n//2+n%2-1 : n//2 + 1
+'''
 
