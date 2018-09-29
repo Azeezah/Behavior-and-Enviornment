@@ -20,13 +20,13 @@ def show(data, col_num=0, filename="graph.png"):
   plt.xlabel(the_important_columns[col_num])
   plt.ylabel('Frequency')
   plt.savefig(filename)
-  plt.clf()
+  plt.clf()  #wontha suggested that I use clf to clear the pyplot state machine
 
 def show_correlations(data):
-  cols = [get_col(label, data) for label in the_important_columns]
-  for i, x in enumerate(the_important_columns):
-    for j, y in enumerate(the_important_columns):
-      print x, 'to', y, correlation(numeric(cols[i]), numeric(cols[j]))
+  col_names = the_important_columns
+  print "\nCorrelations:"
+  for x, y, correlation in get_correlations(data):
+    print col_names[x], 'to', col_names[y], correlation
 
 def show_important_correlations(data):
   col_names = the_important_columns
@@ -36,7 +36,7 @@ def show_important_correlations(data):
 
 def show_stats(x, name):
   print '\n'+name+':'
-  print 'length %d, mean %.2f, stddev %.2f, range %d, median %.2f' \
+  print 'length %d, mean %.2f, stddev %.2f, range %.2f, median %.2f' \
     % (len(x), mean(x), stddev(x), max(x)-min(x), median(x))
 
   modes_x = modes(x)
