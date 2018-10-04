@@ -11,6 +11,11 @@ def show_all(data, cols=the_important_columns):
   for i, col in enumerate(cols):
     show(data, i, filename=col+'.png')
 
+def show_all_scatterplots(data, cols=the_important_columns):
+  for i, col_x in enumerate(cols):
+    for j, col_y in enumerate(cols):
+      show(data, i, j, filename=col_x+' v '+col_y+'.png')
+
 def show(data, col_num=0, filename="graph.png"):
   '''takes a list of dictionaries'''
   x = get_col(the_important_columns[col_num], data)
@@ -21,6 +26,20 @@ def show(data, col_num=0, filename="graph.png"):
   plt.ylabel('Frequency')
   plt.savefig(filename)
   plt.clf()  #wontha suggested that I use clf to clear the pyplot state machine
+
+def show_scatterplot(data, col_num_x=0, col_num_y=0, filename="graph.png"):
+  '''takes a list of dictionaries'''
+  x = get_col(the_important_columns[col_num_x], data)
+  y = get_col(the_important_columns[col_num_y], data)
+  x = numeric(x)
+  y = numeric(y)
+  show_stats(x, the_important_columns[col_num_x])
+  show_stats(y, the_important_columns[col_num_y])
+  plt.scatter(x, y)
+  plt.xlabel(the_important_columns[col_num_x])
+  plt.ylabel(the_important_columns[col_num_y])
+  plt.savefig(filename)
+  plt.clf()
 
 def show_correlations(data):
   col_names = the_important_columns
