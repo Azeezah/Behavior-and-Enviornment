@@ -41,28 +41,6 @@ def describe_half_seconds(data):
   describe_all_columns_separately(data)
   relate_ambient_temp_to_relative_humidity(data)
 
-def interactive_data_analysis():
-  import re
-  get_input = raw_input if 'raw_input' in dir(vars()['__builtins__']) else input
-  dimension = get_input('Would you like to view 1d or 2d data? (enter 1 or 2)?')
-  columns = get_input("Which columns would you like to see? (enter numbers with spaces)")
-  if bool(re.match(dimension, '\d')) and bool(re.match(columns, '(\d[\W])*\d')):
-    columns = map(int, split(columns))
-    dimension = int(dimension)
-  else:
-    print("Received invalid input")
-    quit()
-  if dimension == 1:
-    for col in columns:
-      show_stats(col)
-      generate_histogram(col)
-  elif dimension == 2:
-    columns = [extract.column_names[i] for i in columns]
-    for i, col_x in enumerate(columns):
-      for col_y in columns[i+1::]:  #avoid duplicate pairs
-        show.show_correlation(col_x, col_y)
-        show.create_scatterplot(col_x, col_y)
-
 class SubDirectory():
   def __init__(self, dir_name):
     self.dir_name = dir_name
@@ -72,34 +50,35 @@ class SubDirectory():
     except:  # os specific error if directory exists already
       chdir(self.dir_name)
   def __exit__(self, *_):
-    chdir('..') 
+    chdir('..')
 
 if __name__ == '__main__':
-  import time
-  from datetime import datetime
-  finish_time = lambda delta: datetime.fromtimestamp(time.time() + delta)
-
+  print("Extracting data")
   data = extract.readfile('data.txt')
   extract.writefile(data, 'processed_data.csv')
-  num_cols = len(data)
+  get_input = raw_input if 'raw_input' in dir(vars()['__builtins__']) else input
 
-  print("describing all columns separately")
-  print("approx. finish time: ", finish_time(5 * num_cols))
-  with SubDirectory('describe_all_columns_separately'):
-    describe_all_columns_separately(data)
+  print("Describing all columns separately")
+  #with SubDirectory('describe_all_columns_separately'):
+  describe_all_columns_separately(data)
+  get_input('finished part 1 (move the graph files and hit enter for the next part)')
   
-  print("relating ambient temp to mean radiant temp")
-  print("approx. finish time: ", finish_time(5 * num_cols))
-  with SubDirectory('relate_ambient_temp_to_mean_radiant_temp'):
-    relate_ambient_temp_to_mean_radiant_temp(data)
+  print("Relating ambient temp to mean radiant temp")
+  #with SubDirectory('relate_ambient_temp_to_mean_radiant_temp'):
+  relate_ambient_temp_to_mean_radiant_temp(data)
+  get_input('finished part 2 (move the graph files and hit enter for the next part)')
+
+  print(relate_ambient_temp_to_relative_humidity(data):
+  relate_ambient_temp_to_relative_humidity(data)
+  get_input('finished part 3 (move the graph files and hit enter for the next part)')
   
-  print("describing occupied rooms")
-  print("approx. finish time: ", finish_time(5 * num_cols))
-  with SubDirectory('describe_occupied_rooms'):
-    decribe_occupied_rooms(data)
+  print("Describing occupied rooms")
+  #with SubDirectory('describe_occupied_rooms'):
+  decribe_occupied_rooms(data)
+  get_input('finished part 4 (move the graph files and hit enter for the next part)')
   
-  print("describing half seconds")
-  print("approx. finish time: ", finish_time(5 * num_cols))
-  with SubDirectory('describe_half_seconds'):
-    describe_half_seconds(data)
+  print("Describing half seconds")
+  #with SubDirectory('describe_half_seconds'):
+  describe_half_seconds(data)
+  get_input('finished part 5 (move the graph files and hit enter for the next part)')
  

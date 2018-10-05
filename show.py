@@ -2,19 +2,7 @@ import matplotlib.pyplot as plt
 from math import sqrt
 from random import choice
 
-from extract import column_names
-
-the_important_columns = ["Time", "Occupant Number", "INDOOR Ambient Temp.", "INDOOR Relative Humidity", "INDOOR Air Velocity", "INDOOR Mean Radiant Temp.", "Predicted Mean Vote (PMV)", "Occupancy 1"]
-
-# a delta just large enough to equate 1 and n/n
-effective_infinitesimal = 1e-15
-
-def show_all(data, cols=the_important_columns):
-  for i, col in enumerate(cols):
-    show(data, i, filename=col+'.png')
-
 def create_histogram(x, name):
-  '''takes a list of dictionaries'''
   plt.hist(x, bins=50)
   plt.xlabel(name)
   plt.ylabel('Frequency')
@@ -22,38 +10,13 @@ def create_histogram(x, name):
   plt.clf()  #wontha suggested that I use clf to clear the pyplot state machine
 
 def create_scatterplot(x, name_x, y, name_y):
-  '''takes a list of dictionaries'''
+  length = min(len(x), len(y))
+  x, y = x[:length], y[:length]
   plt.scatter(x, y)
   plt.xlabel(name_x)
   plt.ylabel(name_y)
   plt.savefig(name_x + ' to ' + name_y+'.png')
   plt.clf() 
-
-def show_scatterplot(data, col_num_x=0, col_num_y=0, filename="graph.png"):
-  '''takes a list of dictionaries'''
-  x = get_col(the_important_columns[col_num_x], data)
-  y = get_col(the_important_columns[col_num_y], data)
-  x = numeric(x)
-  y = numeric(y)
-  show_stats(x, the_important_columns[col_num_x])
-  show_stats(y, the_important_columns[col_num_y])
-  plt.scatter(x, y)
-  plt.xlabel(the_important_columns[col_num_x])
-  plt.ylabel(the_important_columns[col_num_y])
-  plt.savefig(filename)
-  plt.clf()
-
-def show_correlations(data):
-  col_names = the_important_columns
-  print("\nCorrelations:")
-  for x, y, correlation in get_correlations(data):
-    print col_names[x], 'to', col_names[y], correlation
-
-def show_important_correlations(data):
-  col_names = the_important_columns
-  print("\nThe Larger Correlations:")
-  for x, y, correlation in get_important_correlations(data):
-    print col_names[x], 'to', col_names[y], correlation
 
 def show_stats(x, name):
   print('\n'+name+':')
@@ -63,16 +26,6 @@ def show_stats(x, name):
   modes_x = modes(x)
   num_modes = len(modes_x)
   print('modes: ', modes_x[:3], ('and %d more' % (num_modes-3) if num_modes > 3 else ''))
-
-def get_correlations(data):
-  cols = [get_col(label, data) for label in the_important_columns]
-  for i, x in enumerate(the_important_columns):
-    for j, y in enumerate(the_important_columns):
-      yield i, j, correlation(numeric(cols[i]), numeric(cols[j]))
-
-def get_important_correlations(data):
-  return filter(lambda (x, y, c): (c > 0.5 and c < 1-effective_infinitesimal),
-    get_correlations(data))
 
 def get_col(col_name, data):
   return remove_none([row[col_name] for row in data])
