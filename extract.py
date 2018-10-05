@@ -1,19 +1,20 @@
 #read excel file: https://www.geeksforgeeks.org/reading-excel-file-using-python/
 #write csv headers: https://stackoverflow.com/a/47710814
-the_important_columns = ["Time", "Occupant Number", "INDOOR Ambient Temp.", "INDOOR Relative Humidity", "INDOOR Air Velocity", "INDOOR Mean Radiant Temp.", "Predicted Mean Vote (PMV)"]
+column_names = ["Time", "Occupant Number", "INDOOR Ambient Temp.", "INDOOR Relative Humidity", "INDOOR Air Velocity", "INDOOR Mean Radiant Temp.", "Predicted Mean Vote (PMV)", "Occupancy 1"]
 
-'''
-import xlrd as x
-wb = x.open_workbook(("cols.xlsx"))
-sheet = wb.sheet_by_index(0)
-the_important_columns_set = set(the_important_columns)
-#extract a list of tuples (zero'ed_index, column_name) from excel file
-indexed_cols = [
-  (int(row[0].value)-1, row[2].value)
-  for row in sheet.get_rows()
-  if row[2].value in the_important_columns_set
-]
-'''
+def get_column_names():
+  import xlrd as x
+  wb = x.open_workbook(("cols.xlsx"))
+  sheet = wb.sheet_by_index(0)
+  column_names_set = set(column_names)
+  #extract a list of tuples (zero'ed_index, column_name) from excel file
+  indexed_cols = [
+    (int(row[0].value)-1, row[2].value)
+    for row in sheet.get_rows()
+    if row[2].value in column_names_set
+  ]
+  return indexed_cols
+
 indexed_cols = [
   (1-1, "Time"),
   (2-1, "Occupant Number"),
@@ -22,9 +23,8 @@ indexed_cols = [
   (8-1, "INDOOR Air Velocity"),
   (9-1, "INDOOR Mean Radiant Temp."),
   (118-1, "Predicted Mean Vote (PMV)"),
+  (3-1, "Occupancy 1"),
 ]
-
-print(indexed_cols)
 
 def maybeFloat(string):
   '''Converts NaN values to None.
@@ -43,9 +43,11 @@ def writefile(labeled_rows, output_path='data.csv'):
   import csv
   with open(output_path, 'w') as output_file:
     writer = csv.writer(output_file)
-    writer.writerow(the_important_columns)
+    writer.writerow(column_names)
     for row in labeled_rows:
-      writer.writerow([row[col] for col in the_important_columns])
+      writer.writerow([row[col] for col in column_names])
+
+get_input = raw_input if 'raw_input' in dir(vars()['__builtins__']) else input
 
 if __name__ == '__main__':
   from sys import argv, exit
@@ -53,11 +55,12 @@ if __name__ == '__main__':
     input_filepath, output_filepath = argv[1], argv[2]
   else:
     print('Usage: python extract.py <input filepath> <output filepath>')
-    if input('Use defaults?'):
+    if get_input('Use defaults? (y/n)') == 'y':
       input_filepath, output_filepath = "smaller data.txt", "processed_data.csv"
     else:
+      print('Ok bye')
       exit()
-  print('labeling rows...')
+  print('Labeling rows...')
   labeled_rows = readfile(input_filepath)
-  print('writing csv...')
+  print('Writing csv...')
   writefile(labeled_rows, output_filepath)
