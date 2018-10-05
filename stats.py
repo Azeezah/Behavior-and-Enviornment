@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from math import sqrt
 from random import choice
+from utils import print_out
 
 def create_histogram(x, name):
   plt.hist(x, bins=50)
@@ -25,7 +26,7 @@ def show_stats(x, name):
 
   modes_x = modes(x)
   num_modes = len(modes_x)
-  print('modes: ', modes_x[:3], ('and %d more' % (num_modes-3) if num_modes > 3 else ''))
+  print_out('modes: ', modes_x[:3], ('and %d more' % (num_modes-3) if num_modes > 3 else ''))
 
 def get_col(col_name, data):
   return remove_none([row[col_name] for row in data])

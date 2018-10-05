@@ -1,9 +1,13 @@
 def get_input(*args):
   '''works the same in python 2 and 3'''
-  return raw_input(*args) if 'raw_input' in dir(vars()['__builtins__']) else input(*args)
+  try:
+    return raw_input(*args)
+  except NameError:
+    return input(*args)
 
 def print_out(*args):
-  '''works the same in python 2 and 3'''
+  '''works the same in python 2 and 3 since it won't print multiple things
+  as tuples in python 2'''
   print(' '.join(map(str, args)))
 
 def maybeFloat(string):
@@ -13,7 +17,8 @@ def maybeFloat(string):
   return None if string == "NaN" else float(string)
 
 #https://www.rexegg.com/regex-disambiguation.html#noncap
-def get_arg(name, argv, numeric=True, has_val=False):
+def get_arg(name, argv, numeric=False, has_val=False):
+  import re
   if has_val:
     arg_format = "(?:--"+ name+"|"+"-"+name[0]+")"
     value_format = r"(\d+)(?:\s|$)" if numeric else r"(?:\"(.+)\")|(.+(?:\s|$))"
