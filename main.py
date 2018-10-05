@@ -2,7 +2,7 @@ import extract
 import stats
 import utils
 from os import chdir, mkdir
-from utils import print_out, get_arg
+from utils import print_out, get_arg, get_input
 
 def describe_all_columns_separately(data):
   for name in extract.column_names:
@@ -46,22 +46,23 @@ def describe_half_seconds(data):
   describe_all_columns_separately(data)
   relate_ambient_temp_to_relative_humidity(data)
 
-def interactive_data_analysis():
+def interactive_data_analysis(data):
   import re
-  get_input = raw_input if 'raw_input' in dir(vars()['__builtins__']) else input
-  for i, name in enumerate(extract.column_names): print(i, name)
-  dimension = get_input('Would you like to view 1d or 2d data? (enter 1 or 2)?')
-  columns = get_input("Which columns would you like to see? (enter numbers with spaces)")
-  if bool(re.match(dimension, '\d')) and bool(re.match(columns, '(\d[\W])*\d')):
-    columns = map(int, split(columns))
-    dimension = int(dimension)
+  for i, name in enumerate(extract.column_names): print_out(i, name)
+  dimension = get_input('Would you like to view 1d or 2d data? (enter 1 or 2)? ')
+  columns = get_input("Which columns would you like to see? (enter numbers with spaces) ")
+  if bool(re.match(dimension[:-1], r'1|2')) and bool(re.match(columns[:-1], r'[0-9](\s[0-9])*')):
+    columns = map(int, columns.strip().split())
+    dimension = int(dimension.strip())
   else:
     print("Received invalid input")
     quit()
   if dimension == 1:
-    for col in columns:
-      stats.stats(col)
-      generate_histogram(col)
+    for col_num in columns:
+      name = extract.column_names[col_num]
+      col = stats.get_col(name, data)
+      stats.show_stats(col, name)
+      stats.create_histogram(col, name)
   elif dimension == 2:
     columns = [extract.column_names[i] for i in columns]
     for i, col_x in enumerate(columns):
@@ -69,31 +70,7 @@ def interactive_data_analysis():
         stats.show_correlation(col_x, col_y)
         stats.create_scatterplot(col_x, col_y)
 
-if __name__ == '__main__':
-  from sys import argv
-  data_filepath = "data.txt"
-
-  if get_arg('help', argv):
-    print_out('''
-              Usage: python main.py <options>
-
-              Options:
-              --interactive(-i),
-              --datafile(-d) <filepath>
-
-              Example: python main.py -d data.txt''')
-    quit()
-  if get_arg('datafile', argv):
-    data_filepath = get_arg('datafile', argv)
-  if get_arg('interactive', argv):
-    interactive_data_analysis()
-    quit()
-
-  print("Extracting data")
-  data = extract.readfile(data_filepath)
-  extract.writefile(data, 'processed_data.csv')
-  get_input = raw_input if 'raw_input' in dir(vars()['__builtins__']) else input
-
+def default_data_analysis(data):
   print("Describing all columns separately")
   #with SubDirectory('describe_all_columns_separately'):
   describe_all_columns_separately(data)
@@ -118,3 +95,29 @@ if __name__ == '__main__':
   describe_half_seconds(data)
   get_input('finished part 5 (move the graph files and hit enter for the next part)')
  
+if __name__ == '__main__':
+  from sys import argv
+  data_filepath = "data.txt"
+
+  if get_arg('help', argv):
+    print_out('''
+              Usage: python main.py <options>
+
+              Options:
+              --interactive(-i),
+              --datafile(-d) <filepath>
+
+              Example: python main.py -d data.txt''')
+    quit()
+  if get_arg('datafile', argv, has_val=True):
+    data_filepath = get_arg('datafile', argv, has_val=True)
+ 
+  print("Extracting data")
+  data = extract.readfile(data_filepath)
+  extract.writefile(data, 'processed_data.csv')
+
+  if get_arg('interactive', argv):
+    interactive_data_analysis(data)
+  else:
+    default_data_analysis(data)
+
