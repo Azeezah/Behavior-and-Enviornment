@@ -1,6 +1,16 @@
-#read excel file: https://www.geeksforgeeks.org/reading-excel-file-using-python/
-#write csv headers: https://stackoverflow.com/a/47710814
+import random
 column_names = ["Time", "Occupant Number", "INDOOR Ambient Temp.", "INDOOR Relative Humidity", "INDOOR Air Velocity", "INDOOR Mean Radiant Temp.", "Predicted Mean Vote (PMV)", "Occupancy 1"]
+
+def sample_data(in_filename, out_filename, percent=100):
+  in_file = open(in_filename, 'rb')
+  out_file = open(out_filename, 'wb')
+  line = in_file.readline()
+  while line:
+    if random.random() < percent/100.0:
+      out_file.write(line)
+    line = in_file.readline()
+  in_file.close()
+  out_file.close() 
 
 def get_column_names():
   import xlrd as x
@@ -56,7 +66,7 @@ if __name__ == '__main__':
   else:
     print('Usage: python extract.py <input filepath> <output filepath>')
     if get_input('Use defaults? (y/n)') == 'y':
-      input_filepath, output_filepath = "smaller data.txt", "processed_data.csv"
+      input_filepath, output_filepath = "data.txt", "processed_data.csv"
     else:
       print('Ok bye')
       exit()
