@@ -1,6 +1,7 @@
 import extract
 import show
- 
+from os import chdir, mkdir
+
 def describe_all_columns_separately(data):
   for name in extract.column_names:
     col = show.get_col(name, data)
@@ -62,6 +63,17 @@ def interactive_data_analysis():
         show.show_correlation(col_x, col_y)
         show.create_scatterplot(col_x, col_y)
 
+class SubDirectory():
+  def __init__(self, dir_name):
+    self.dir_name = dir_name
+  def __enter__(self):
+    try:
+      mkdir(self.dir_name)
+    except:  # os specific error if directory exists already
+      chdir(self.dir_name)
+  def __exit__(self, *_):
+    chdir('..') 
+
 if __name__ == '__main__':
   import time
   from datetime import datetime
@@ -73,17 +85,21 @@ if __name__ == '__main__':
 
   print("describing all columns separately")
   print("approx. finish time: ", finish_time(5 * num_cols))
-  describe_all_columns_separately(data)
+  with SubDirectory('describe_all_columns_separately'):
+    describe_all_columns_separately(data)
   
   print("relating ambient temp to mean radiant temp")
   print("approx. finish time: ", finish_time(5 * num_cols))
-  relate_ambient_temp_to_mean_radiant_temp(data)
+  with SubDirectory('relate_ambient_temp_to_mean_radiant_temp'):
+    relate_ambient_temp_to_mean_radiant_temp(data)
   
   print("describing occupied rooms")
   print("approx. finish time: ", finish_time(5 * num_cols))
-  decribe_occupied_rooms(data)
+  with SubDirectory('describe_occupied_rooms'):
+    decribe_occupied_rooms(data)
   
   print("describing half seconds")
   print("approx. finish time: ", finish_time(5 * num_cols))
-  describe_half_seconds(data)
+  with SubDirectory('describe_half_seconds'):
+    describe_half_seconds(data)
  
