@@ -1,4 +1,6 @@
 import random
+from utils import maybeFloat, get_input
+
 column_names = ["Time", "Occupant Number", "INDOOR Ambient Temp.", "INDOOR Relative Humidity", "INDOOR Air Velocity", "INDOOR Mean Radiant Temp.", "Predicted Mean Vote (PMV)", "Occupancy 1"]
 
 def sample_data(in_filename, out_filename, percent=100):
@@ -36,12 +38,6 @@ indexed_cols = [
   (3-1, "Occupancy 1"),
 ]
 
-def maybeFloat(string):
-  '''Converts NaN values to None.
-  While NaN is a valid floating point value,
-  it is truthy and cannot be tested for equality'''
-  return None if string == "NaN" else float(string)
-
 def readfile(office_env_data_file):
   with open(office_env_data_file, 'rb') as f:
     rows = [[maybeFloat(val) for val in row.split()] for row in f.readlines()]
@@ -56,8 +52,6 @@ def writefile(labeled_rows, output_path='data.csv'):
     writer.writerow(column_names)
     for row in labeled_rows:
       writer.writerow([row[col] for col in column_names])
-
-get_input = raw_input if 'raw_input' in dir(vars()['__builtins__']) else input
 
 if __name__ == '__main__':
   from sys import argv, exit

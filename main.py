@@ -1,36 +1,38 @@
 import extract
-import show
+import stats
+import utils
 from os import chdir, mkdir
+from utils import print_out, get_arg
 
 def describe_all_columns_separately(data):
   for name in extract.column_names:
-    col = show.get_col(name, data)
-    show.show_stats(col, name)
-    show.create_histogram(col, name)
+    col = stats.get_col(name, data)
+    stats.show_stats(col, name)
+    stats.create_histogram(col, name)
 
 def relate_ambient_temp_to_mean_radiant_temp(data):
-  ambient = show.get_col('INDOOR Ambient Temp.', data)
-  mean_radiant = show.get_col('INDOOR Mean Radiant Temp.', data)
-  show.create_scatterplot(ambient, 'INDOOR Ambient Temp.', mean_radiant, 'INDOOR Mean Radiant Temp.')
-  print("Correlation coefficient: ", show.correlation(ambient, mean_radiant))
+  ambient = stats.get_col('INDOOR Ambient Temp.', data)
+  mean_radiant = stats.get_col('INDOOR Mean Radiant Temp.', data)
+  stats.create_scatterplot(ambient, 'INDOOR Ambient Temp.', mean_radiant, 'INDOOR Mean Radiant Temp.')
+  print("Correlation coefficient: ", stats.correlation(ambient, mean_radiant))
  
 def relate_ambient_temp_to_relative_humidity(data):
-  temp = show.get_col('INDOOR Ambient Temp.', data)
-  humidity = show.get_col('INDOOR Relative Humidity', data)
-  show.create_scatterplot(temp, 'INDOOR Ambient Temp.', humidity, 'INDOOR Relative Humidity')
+  temp = stats.get_col('INDOOR Ambient Temp.', data)
+  humidity = stats.get_col('INDOOR Relative Humidity', data)
+  stats.create_scatterplot(temp, 'INDOOR Ambient Temp.', humidity, 'INDOOR Relative Humidity')
   print('INDOOR Ambient Temp. to INDOOR Relative Humidity')
-  print("Correlation coefficient: ", show.correlation(temp, humidity))
+  print_out("Correlation coefficient: ", stats.correlation(temp, humidity))
 
-  temp_farenheit = map(show.celsius_to_farenheit, temp)
-  show.create_scatterplot(temp_farenheit, 'INDOOR Ambient Temp. (degrees Farenheit)', humidity, 'INDOOR Relative Humidity')
+  temp_farenheit = map(utils.celsius_to_farenheit, temp)
+  stats.create_scatterplot(temp_farenheit, 'INDOOR Ambient Temp. (degrees Farenheit)', humidity, 'INDOOR Relative Humidity')
   print('INDOOR Ambient Temp. (degrees Farenheit) to INDOOR Relative Humidity')
-  print("Correlation coefficient: ", show.correlation(temp_farenheit, humidity))
+  print_out("Correlation coefficient: ", stats.correlation(temp_farenheit, humidity))
   
-  temp_norm = show.normalize(temp)
-  humidity_norm = show.normalize(humidity)
-  show.create_scatterplot(temp_norm, 'INDOOR Ambient Temp. (normalized)', humidity_norm, 'INDOOR Relative Humidity (normalized)')
+  temp_norm = stats.normalize(temp)
+  humidity_norm = stats.normalize(humidity)
+  stats.create_scatterplot(temp_norm, 'INDOOR Ambient Temp. (normalized)', humidity_norm, 'INDOOR Relative Humidity (normalized)')
   print('INDOOR Ambient Temp. (normalized) to INDOOR Relative Humidity (normalized)')
-  print("Correlation coefficient: ", show.correlation(temp_norm, humidity_norm))
+  print_out("Correlation coefficient: ", stats.correlation(temp_norm, humidity_norm))
 
 def describe_occupied_rooms(data):
   data = [row for row in data if row["Occupancy 1"] == 1]
@@ -44,20 +46,51 @@ def describe_half_seconds(data):
   describe_all_columns_separately(data)
   relate_ambient_temp_to_relative_humidity(data)
 
-class SubDirectory():
-  def __init__(self, dir_name):
-    self.dir_name = dir_name
-  def __enter__(self):
-    try:
-      mkdir(self.dir_name)
-    except:  # os specific error if directory exists already
-      chdir(self.dir_name)
-  def __exit__(self, *_):
-    chdir('..')
+def interactive_data_analysis():
+  import re
+  get_input = raw_input if 'raw_input' in dir(vars()['__builtins__']) else input
+  for i, name in enumerate(extract.column_names): print(i, name)
+  dimension = get_input('Would you like to view 1d or 2d data? (enter 1 or 2)?')
+  columns = get_input("Which columns would you like to see? (enter numbers with spaces)")
+  if bool(re.match(dimension, '\d')) and bool(re.match(columns, '(\d[\W])*\d')):
+    columns = map(int, split(columns))
+    dimension = int(dimension)
+  else:
+    print("Received invalid input")
+    quit()
+  if dimension == 1:
+    for col in columns:
+      stats.stats(col)
+      generate_histogram(col)
+  elif dimension == 2:
+    columns = [extract.column_names[i] for i in columns]
+    for i, col_x in enumerate(columns):
+      for col_y in columns[i+1::]:  #avoid duplicate pairs
+        stats.show_correlation(col_x, col_y)
+        stats.create_scatterplot(col_x, col_y)
 
 if __name__ == '__main__':
+  from sys import argv
+  data_filepath = "data.txt"
+
+  if get_arg('help', argv):
+    print_out('''
+              Usage: python main.py <options>
+
+              Options:
+              --interactive(-i),
+              --datafile(-d) <filepath>
+
+              Example: python main.py -d data.txt''')
+    quit()
+  if get_arg('datafile', argv):
+    data_filepath = get_arg('datafile', argv)
+  if get_arg('interactive', argv):
+    interactive_data_analysis()
+    quit()
+
   print("Extracting data")
-  data = extract.readfile('data.txt')
+  data = extract.readfile(data_filepath)
   extract.writefile(data, 'processed_data.csv')
   get_input = raw_input if 'raw_input' in dir(vars()['__builtins__']) else input
 
