@@ -18,18 +18,21 @@ def relate_ambient_temp_to_relative_humidity(data):
   temp = show.get_col('INDOOR Ambient Temp.', data)
   humidity = show.get_col('INDOOR Relative Humidity', data)
   show.create_scatterplot(temp, 'INDOOR Ambient Temp.', humidity, 'INDOOR Relative Humidity')
+  print('INDOOR Ambient Temp. to INDOOR Relative Humidity')
   print("Correlation coefficient: ", show.correlation(temp, humidity))
 
   temp_farenheit = map(show.celsius_to_farenheit, temp)
   show.create_scatterplot(temp_farenheit, 'INDOOR Ambient Temp. (degrees Farenheit)', humidity, 'INDOOR Relative Humidity')
-  temp_norm = show.normalize(temp)
+  print('INDOOR Ambient Temp. (degrees Farenheit) to INDOOR Relative Humidity')
   print("Correlation coefficient: ", show.correlation(temp_farenheit, humidity))
   
+  temp_norm = show.normalize(temp)
   humidity_norm = show.normalize(humidity)
   show.create_scatterplot(temp_norm, 'INDOOR Ambient Temp. (normalized)', humidity_norm, 'INDOOR Relative Humidity (normalized)')
+  print('INDOOR Ambient Temp. (normalized) to INDOOR Relative Humidity (normalized)')
   print("Correlation coefficient: ", show.correlation(temp_norm, humidity_norm))
 
-def decribe_occupied_rooms(data):
+def describe_occupied_rooms(data):
   data = [row for row in data if row["Occupancy 1"] == 1]
   extract.writefile(data, 'occupancy_1.csv')
   describe_all_columns_separately(data)
@@ -68,13 +71,13 @@ if __name__ == '__main__':
   relate_ambient_temp_to_mean_radiant_temp(data)
   get_input('finished part 2 (move the graph files and hit enter for the next part)')
 
-  print(relate_ambient_temp_to_relative_humidity(data):
+  print("relate_ambient_temp_to_relative_humidity")
   relate_ambient_temp_to_relative_humidity(data)
   get_input('finished part 3 (move the graph files and hit enter for the next part)')
   
   print("Describing occupied rooms")
   #with SubDirectory('describe_occupied_rooms'):
-  decribe_occupied_rooms(data)
+  describe_occupied_rooms(data)
   get_input('finished part 4 (move the graph files and hit enter for the next part)')
   
   print("Describing half seconds")
