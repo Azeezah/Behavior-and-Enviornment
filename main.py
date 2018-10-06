@@ -40,7 +40,7 @@ def describe_occupied_rooms(data):
   describe_all_columns_separately(data)
   relate_ambient_temp_to_relative_humidity(data)
 
-def describe_half_seconds(data): 
+def describe_noon(data): 
   data = [row for row in data if row["Time"]%1 == 0.5]
   extract.writefile(data, 'tod_1200.csv')
   describe_all_columns_separately(data)
@@ -91,8 +91,8 @@ def default_data_analysis(data):
   get_input('finished part 4 (move the graph files and hit enter for the next part)')
   
   print("Describing half seconds")
-  #with SubDirectory('describe_half_seconds'):
-  describe_half_seconds(data)
+  #with SubDirectory('describe_noon'):
+  describe_noon(data)
   get_input('finished part 5 (move the graph files and hit enter for the next part)')
  
 if __name__ == '__main__':
